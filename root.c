@@ -136,12 +136,9 @@ void eat ( ResourceEater eater )
 
             printf ( "Attempting to free surface set index %zu.\n", ix );
 
-            if ( surface != NULL )
-            {
-                SDL_FreeSurface ( surface );
-                surface = NULL;
-                eater -> surface_set[ ix ] = NULL;
-            }
+            SDL_FreeSurface ( surface );
+            surface = NULL;
+            eater -> surface_set[ ix ] = NULL;
         }
 
         free ( eater -> surface_set );
