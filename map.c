@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "map.h"
 
@@ -188,4 +189,39 @@ void * mapRemk
 	map -> entries[ ix ] = NULL;
 
 	return value;
+}
+
+/// Key clearing function for dynamically allocated char pointers.
+/// DO NOT use with statically allocated char pointers.
+
+void chpKeyclr ( char * chp )
+{
+	if ( chp != NULL ) free ( chp );
+}
+
+/// Hash function for char pointer keys.
+/// Applies a power multiplier to character values 4 bytes at a time to expand the range of
+/// produced indices.
+
+int chpHash ( void * vpt, int size )
+{
+	if ( vpt == NULL ) return 0;
+	
+	char * chp = vpt;
+
+	int len = strlen ( chp );
+	int ix = 0;
+	int mx = 1;
+	unsigned int sum = 0;
+	
+	do 
+	{
+		sum += chp[ ix ++ ] * mx;
+
+		if ( ix % 4 == 0 ) mx = 1;
+		else mx *= 256;
+	} 
+	while ( ix < len );
+
+	return sum % size;
 }

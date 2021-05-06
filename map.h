@@ -81,3 +81,14 @@ void * mapRemi
 	HashMap map,
 	int index
 );
+
+void chpKeyclr 
+( 
+	char * chp 
+);
+
+int chpHash 
+( 
+	void * vpt, 
+	int size 
+);
