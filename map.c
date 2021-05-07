@@ -11,14 +11,6 @@
 
 #endif
 
-/// Simple Insert: key, value only.
-/// Incremented Insert: key, value, and increment for map expansion.
-/// Memory-Conscious Insert: key, value, and memory clearing functions.
-
-#define SINS( map, key, value ) mapIns ( map, key, value, NULL, NULL, DEFAULT_INCREMENT );
-#define IINS( map, key, value, inc ) mapIns ( map, key, value, NULL, NULL, inc );
-#define MINS( map, key, value, kclr, vclr ) mapIns ( map, key, value, kclr, vclr, DEFAULT_INCREMENT );
-
 static void entryClr 
 ( 
 	Entry entry,
@@ -58,6 +50,14 @@ HashMap mapBuild
 
 		map -> entries = NULL;
 		map -> entries = malloc ( sizeof ( Entry ) * limit );
+
+		if ( map -> entries != NULL )
+		{
+			for ( int ix = 0; ix < limit; ix ++ )
+			{			
+				map -> entries[ ix ] = NULL;
+			}
+		}
 	}
 
 	return map;
@@ -131,7 +131,7 @@ void mapIns
 
 		if ( exis == NULL )
 		{
-			INST ( map, index, entry );
+			map -> entries[ index ] = entry;
 		}
 
 		else if ( map -> eq != NULL )
@@ -175,7 +175,25 @@ void mapIns
 				}
 			}
 		}
+
+		map -> volume ++;
 	}
+}
+
+void * mapAcck
+(
+	HashMap map, void * key
+)
+{
+	int ix = HASH ( map, key );
+
+	printf ( "%d\n", ix );
+
+	Entry en = map -> entries[ ix ];
+
+	if ( en == NULL ) return NULL;
+
+	return en -> value;
 }
 
 void * mapRemk
@@ -203,13 +221,11 @@ void chpKeyclr ( char * chp )
 /// Applies a power multiplier to character values 4 bytes at a time to expand the range of
 /// produced indices.
 
-int chpHash ( void * vpt, int size )
+int chpHash ( char * chp, int size )
 {
-	if ( vpt == NULL ) return 0;
-	
-	char * chp = vpt;
+	if ( chp == NULL ) return 0;
 
-	int len = strlen ( chp );
+	size_t len = strlen ( chp );
 	int ix = 0;
 	int mx = 1;
 	unsigned int sum = 0;

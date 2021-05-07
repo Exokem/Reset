@@ -1,23 +1,8 @@
 
 #include "mobj.h"
+#include "res.h"
 
-Mrec defineMrec ( int x, int y, int w, int h )
-{
-	Mrec rec = NULL; 
-	rec = malloc ( sizeof ( Mrec ) );
-
-	if ( rec != NULL )
-	{
-		rec -> x = x;
-		rec -> y = y;
-		rec -> w = w;
-		rec -> h = h;
-	}
-
-	return rec;
-}
-
-Mobj mobjInst ( char idn[ IDN_LIM ], Mrec rec, SDL_Surface * ( * binder ) ( char * ) )
+Mobj mobjInst ( char idn[ IDN_LIM ], SDL_Rect rec, Root root )
 {
 	Mobj mobj = NULL;
 	mobj = malloc ( sizeof ( Mobj ) );
@@ -25,25 +10,31 @@ Mobj mobjInst ( char idn[ IDN_LIM ], Mrec rec, SDL_Surface * ( * binder ) ( char
 	if ( mobj != NULL )
 	{
 		mobj -> ornt = DIR_AL;
-		strcpy ( mobj -> idn, idn );
-		
-		mobj -> rec = NULL;
+		strcpy_s ( mobj -> idn, IDN_LIM, idn );
+
 		mobj -> rec = rec;
 
 		mobj -> mappings = NULL;
 		HashMap mappings = NULL;
 		mappings = mapBuild ( DIR_CRD, &chpHash, &strcmp );
 
-		if ( binder != NULL )
+		if ( root != NULL )
 		{
 			for ( int dir = DIR_DV; dir < DIR_CRD; dir ++ )
 			{
 				// Create the resource identifier, attempt to load a resource.
 				
-				char resIdn[ IDN_LIM + 1 ];
-				strcpy ( resIdn, idn );
+				char resIdn[ IDN_LIM + 6 ];
+				sprintf_s ( resIdn, IDN_LIM + 6, "%s_%d.bmp", idn, dir );
 
-				IINS ( mappings, dir, binder ( resIdn ) );
+				printf ( "%s\n", resIdn );
+
+				SDL_Surface * surface = importBMP ( root, resIdn );
+
+				char ukey[ 16 ];
+				sprintf_s ( ukey, 16, "%d", dir );
+
+				if ( surface != NULL ) IINS ( mappings, ukey, surface, 0 );
 			}
 		}
 
@@ -55,13 +46,9 @@ Mobj mobjInst ( char idn[ IDN_LIM ], Mrec rec, SDL_Surface * ( * binder ) ( char
 
 /// Clearing function for Mobj structure instances. Do not call with other objects.
 
-void mobjClr ( void * vpt )
+void mobjClr ( Mobj mobj )
 {
-	if ( vpt == NULL ) return;
-	
-	Mobj mobj = vpt;
-
-	if ( mobj -> rec != NULL ) free ( mobj -> rec );
+	if ( mobj == NULL ) return;
 
 	// Mappings bind directions ( integral ) to SDL_Surfaces.
 	// A clearing function for surfaces should not be required, surfaces should be managed

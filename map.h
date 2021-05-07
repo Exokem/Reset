@@ -1,8 +1,19 @@
 
+#ifndef _MAP_H
+#define _MAP_H
+
 #define HASH( map, key ) map -> hash ( key, map -> limit );
 #define RETR( map, index ) map -> entries[ index ];
 #define INST( map, index, value ) map -> entries[ index ] = value;
 #define CONT( map, key ) map -> entries[ HASH ( map, key ) ] != NULL;
+
+/// Simple Insert: key, value only.
+/// Incremented Insert: key, value, and increment for map expansion.
+/// Memory-Conscious Insert: key, value, and memory clearing functions.
+
+#define SINS( map, key, value ) mapIns ( map, key, value, NULL, NULL, DEFAULT_INCREMENT );
+#define IINS( map, key, value, inc ) mapIns ( map, key, value, NULL, NULL, inc );
+#define MINS( map, key, value, kclr, vclr ) mapIns ( map, key, value, kclr, vclr, DEFAULT_INCREMENT );
 
 #define EQUIVALENT 0
 
@@ -66,6 +77,12 @@ void mapIns
 	int increment
 );
 
+void * mapAcck
+(
+	HashMap map, 
+	void * key
+);
+
 /// Remove an entry from the map by its index.
 
 void * mapRemk
@@ -92,3 +109,5 @@ int chpHash
 	void * vpt, 
 	int size 
 );
+
+#endif

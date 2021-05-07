@@ -1,5 +1,6 @@
 
 #include "res.h"
+#include "mobj.h"
 
 int main ( int argc, char * argv[] ) 
 {
@@ -14,8 +15,11 @@ int main ( int argc, char * argv[] )
     SDL_Surface * screenSurface = NULL; 
     screenSurface = root -> screen;
 
-    SDL_Surface * character = NULL;
-    character = importBMP ( root, "character.bmp" );
+    Mobj player = NULL;
+    SDL_Rect player_rec = { 0, 0, 16, 16 };
+    player = mobjInst ( "controlled", player_rec, root );
+
+    SDL_Surface * player_icon = mapAcck ( player -> mappings, "0" );
 
     SDL_Event ev;
 
@@ -32,10 +36,15 @@ int main ( int argc, char * argv[] )
 
         SDL_FillRect ( screenSurface, NULL, SDL_MapRGB ( screenSurface -> format, 0x00, 0x00, 0x00 ) );
 
-        if ( character != NULL )
+        if ( player_icon != NULL )
         {
-            SDL_BlitSurface ( character, NULL, screenSurface, NULL );
+            SDL_BlitSurface ( player_icon, NULL, screenSurface, NULL );
         }
+
+        //if ( character != NULL )
+        //{
+        //    //SDL_BlitSurface ( character, NULL, screenSurface, NULL );
+        //}
 
         SDL_UpdateWindowSurface ( window );
     }

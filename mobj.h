@@ -1,6 +1,13 @@
 
+#ifndef _MOBJ_H
+#define _MOBJ_H
+
+#include <SDL2/SDL.h>
+
 #include "root.h"
 #include "map.h"
+
+#define SREC( mrec ) SDL_Rect ( mrec -> x, mrec -> y, mrec -> w, mrec -> h );
 
 #define IDN_LIM 16
 #define DIR_CRD 7
@@ -25,18 +32,10 @@ typedef struct
 
 typedef struct 
 {
-	int x;
-	int y;
-	int w;
-	int h;
-} * Mrec;
-
-typedef struct 
-{
 	//int motive;          ///< Motive status - is this mobj movable.
 	Direction ornt;      ///< Orientation direction.
 	char idn[ IDN_LIM ]; ///< Identifier, limited to 16 characters.
-	Mrec rec;            ///< Bounding rectangle.
+	SDL_Rect rec;        ///< Bounding rectangle.
 	HashMap mappings;    ///< Directional surface resource bindings.
 } * Mobj;
 
@@ -50,6 +49,8 @@ typedef struct
 ///		providing resource surfaces when provided a resource identifier.
 /// </param>
 
-Mobj mobjInst ( char idn[ IDN_LIM ], Mrec rec, SDL_Surface * ( * binder ) ( char * ) );
+Mobj mobjInst ( char idn[ IDN_LIM ], SDL_Rect rec, Root root );
 
-void mobjClr ( void * vpt );
+void mobjClr ( Mobj mobj );
+
+#endif

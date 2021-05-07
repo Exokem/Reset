@@ -1,4 +1,7 @@
 
+#ifndef _ROOT_H
+#define _ROOT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -35,3 +38,5 @@ void terminateRoot ( Root root );
 void trackSurface ( Root root, SDL_Surface * surface );
 
 void eat ( ResourceEater eater );
+
+#endif
