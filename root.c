@@ -11,10 +11,16 @@ static SDL_Window * windowSetup ( int width, int height )
         exit ( EXIT_FAILURE );
     }
 
+    if ( IMG_Init ( IMG_INIT_PNG ) != IMG_INIT_PNG )
+    {
+        fprintf ( stderr, "IMG initialization failure: PNG support uninitialized.\n");
+        exit ( EXIT_FAILURE );
+    }
+
     SDL_Window * window = NULL;
     window = SDL_CreateWindow
     (
-        "Windsor 0", 
+        "Mired", 
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 
         SDL_WINDOW_SHOWN
     );
@@ -30,18 +36,20 @@ static SDL_Window * windowSetup ( int width, int height )
 
 Root setup ()
 {
-	Root root = malloc ( sizeof ( Root ) );
+	Root root = NULL;
+    root = malloc ( sizeof ( struct root_s ) );
 
     if ( root == NULL ) return NULL;
 
 	root -> window = NULL;
     root -> screen = NULL; 
     root -> eater = NULL;
-    root -> terminated = 0;
 
     root -> window = windowSetup ( WIN_HZ, WIN_VT );
+    printf ( "Successfully initialized window for display\n" );
     root -> screen = SDL_GetWindowSurface ( root -> window );
     root -> eater = defineEater();
+    printf ( "Designated resource eater\n" );
 
     return root;
 }
@@ -50,7 +58,7 @@ ResourceEater defineEater ()
 {
     ResourceEater eater = NULL;
 
-    eater = malloc ( sizeof ( ResourceEater ) );
+    eater = malloc ( sizeof ( struct res_eat_s ) );
 
     if ( eater == NULL ) return NULL;
 
@@ -64,28 +72,28 @@ ResourceEater defineEater ()
 void dismantleRoot ( Root root )
 {
 	if ( root == NULL ) return;
-	if ( root -> window != NULL ) SDL_DestroyWindow ( root -> window );
-	if ( root -> screen != NULL ) SDL_FreeSurface ( root -> screen );
+	SDL_DestroyWindow ( root -> window );
+	SDL_FreeSurface ( root -> screen );
 	if ( root -> eater != NULL ) eat ( root -> eater );
-
-	// free ( root -> eater ); why is this a problem? 
 
 	root -> window = NULL;
 	root -> screen = NULL;
 	root -> eater = NULL;
-    root -> terminated = 1;
-}
 
-void flagTermination ( Root root )
-{
-    root -> terminated = 2;
+    free ( root );
+    root = NULL;
 }
 
 void terminateRoot ( Root root )
 {
     dismantleRoot ( root );
+    printf ( "Dismantled root data\n" );
+
+    IMG_Quit();
+    printf ( "Closed SDL IMG\n" );
 
     SDL_Quit();
+    printf ( "Closed SDL2\n" );
 }
 
 void trackSurface ( Root root, SDL_Surface * surface )
@@ -108,19 +116,19 @@ void trackSurface ( Root root, SDL_Surface * surface )
 
     SDL_Surface ** checker;
 
+    eater -> surfaces ++;
+
     checker = realloc 
     (
         set, 
-        sizeof ( set ) + sizeof ( SDL_Surface )
+        eater -> surfaces * sizeof ( SDL_Surface )
     );
 
     if ( checker != NULL )
     {
         eater -> surface_set = checker;
+        eater -> surface_set[ eater -> surfaces - 1 ] = surface;
     }
-
-    eater -> surface_set[ eater -> surfaces ] = surface;
-    eater -> surfaces ++;
 }
 
 void eat ( ResourceEater eater )
@@ -134,17 +142,22 @@ void eat ( ResourceEater eater )
             SDL_Surface * surface = NULL;
             surface = eater -> surface_set[ ix ];
 
-            printf ( "Attempting to free surface set index %zu.\n", ix );
+            if ( surface != NULL )
+            {
+                printf ( "Attempting to free surface set index %zu.\n", ix );
 
-            SDL_FreeSurface ( surface );
-            surface = NULL;
-            eater -> surface_set[ ix ] = NULL;
+                SDL_FreeSurface ( surface );
+                surface = NULL;
+                eater -> surface_set[ ix ] = NULL;
+            }
         }
 
         free ( eater -> surface_set );
+        eater -> surface_set = NULL;
     }
 
-    eater -> surface_set = NULL;
+    free ( eater );
+    eater = NULL;
 
     printf ( "Resource Eater terminated.\n" );
 }

@@ -27,14 +27,15 @@ Mobj mobjInst ( char idn[ IDN_LIM ], SDL_Rect rec, Root root )
 				char resIdn[ IDN_LIM + 6 ];
 				sprintf_s ( resIdn, IDN_LIM + 6, "%s_%d.bmp", idn, dir );
 
-				printf ( "%s\n", resIdn );
+				SDL_Surface * surface = importAsset ( root, resIdn );
 
-				SDL_Surface * surface = importBMP ( root, resIdn );
+				if ( surface != NULL )
+				{
+					char ukey[ 16 ];
+					sprintf_s ( ukey, 16, "%d", dir );
 
-				char ukey[ 16 ];
-				sprintf_s ( ukey, 16, "%d", dir );
-
-				if ( surface != NULL ) IINS ( mappings, ukey, surface, 0 );
+					IINS ( mappings, ukey, surface, 0 );
+				}
 			}
 		}
 
@@ -57,4 +58,5 @@ void mobjClr ( Mobj mobj )
 	if ( mobj -> mappings != NULL ) mapDestroy ( mobj -> mappings, NULL, NULL );
 
 	free ( mobj );
+	mobj = NULL;
 }

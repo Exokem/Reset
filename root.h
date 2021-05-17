@@ -2,9 +2,12 @@
 #ifndef _ROOT_H
 #define _ROOT_H
 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #ifndef _DEFAULT_DIM_
 
@@ -13,18 +16,17 @@
 
 #endif
 
-typedef struct
+typedef struct res_eat_s
 {
 	SDL_Surface ** surface_set;
-	int surfaces;
+	size_t surfaces;
 } * ResourceEater;
 
-typedef struct
+typedef struct root_s
 {
 	SDL_Window * window;
 	SDL_Surface * screen;
 	ResourceEater eater;
-	int terminated;
 } * Root;
 
 Root setup ();

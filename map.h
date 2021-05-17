@@ -31,7 +31,7 @@ typedef struct
 
 #ifndef _ENTRY_DEF
 
-typedef struct 
+typedef struct entry_s
 {
 	void * key;	     ///< Key of the entry.
 	void * value;    ///< Generic value of the entry.

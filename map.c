@@ -27,7 +27,6 @@ static void entryClr
 	entry -> value = NULL;
 
 	free ( entry );
-
 	entry = NULL;
 }
 
@@ -38,6 +37,8 @@ HashMap mapBuild
 	int ( * eq ) ( void *, void * )
 )
 {
+	if ( limit == 0 ) return NULL;
+
 	HashMap map = NULL;
 	map = malloc ( sizeof ( HashMap ) );
 
@@ -49,14 +50,16 @@ HashMap mapBuild
 		map -> eq = eq;
 
 		map -> entries = NULL;
-		map -> entries = malloc ( sizeof ( Entry ) * limit );
+		Entry * entries = malloc ( limit * sizeof ( Entry ) );
 
-		if ( map -> entries != NULL )
+		if ( entries != NULL )
 		{
 			for ( int ix = 0; ix < limit; ix ++ )
 			{			
-				map -> entries[ ix ] = NULL;
+				entries[ ix ] = NULL;
 			}
+
+			map -> entries = entries;
 		}
 	}
 
@@ -119,15 +122,23 @@ void mapIns
 
 	Entry entry = NULL;
 	entry = malloc ( sizeof ( Entry ) );
-
+	
 	if ( entry != NULL )
 	{
+		entry -> key = NULL;
+		entry -> value = NULL;
+
 		entry -> key = key;
 		entry -> value = value;
 
 		int index = HASH ( map, key );
 
-		Entry exis = RETR ( map, index );
+		Entry exis = NULL;
+
+		if ( map -> volume != 0 )
+		{
+			exis = RETR ( map, index );
+		}
 
 		if ( exis == NULL )
 		{
@@ -185,9 +196,11 @@ void * mapAcck
 	HashMap map, void * key
 )
 {
+	if ( map == NULL ) return NULL;
+
 	int ix = HASH ( map, key );
 
-	printf ( "%d\n", ix );
+	if ( map -> limit <= ix ) return NULL;
 
 	Entry en = map -> entries[ ix ];
 
@@ -201,6 +214,8 @@ void * mapRemk
 	HashMap map, void * key
 )
 {
+	if ( map == NULL || key == NULL ) return NULL;
+
 	int ix = HASH ( map, key );
 	void * value = map -> entries[ ix ];
 
@@ -214,7 +229,10 @@ void * mapRemk
 
 void chpKeyclr ( char * chp )
 {
-	if ( chp != NULL ) free ( chp );
+	if ( chp != NULL ) {
+		free ( chp );
+		chp = NULL;
+	}
 }
 
 /// Hash function for char pointer keys.
