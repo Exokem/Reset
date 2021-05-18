@@ -1,10 +1,10 @@
 
 #define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #include "res.h"
 #include "mobj.h"
-
-#include <crtdbg.h>
 
 
 int main ( int argc, char * argv[] ) 
@@ -55,6 +55,8 @@ int main ( int argc, char * argv[] )
 
     //    SDL_UpdateWindowSurface ( window );
     //}
+
+    _CrtDumpMemoryLeaks ();
 
     return EXIT_SUCCESS;
 }

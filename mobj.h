@@ -23,14 +23,7 @@ typedef enum
 	DIR_AL      ///< All Directions
 } Direction;
 
-typedef struct 
-{
-	Direction dir;
-	SDL_Surface * img;
-
-} * ImageMapping;
-
-typedef struct 
+typedef struct mobj_s
 {
 	//int motive;          ///< Motive status - is this mobj movable.
 	Direction ornt;      ///< Orientation direction.

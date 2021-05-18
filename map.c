@@ -30,7 +30,7 @@ static void entryClr
 	entry = NULL;
 }
 
-HashMap mapBuild 
+HashMap mapInst 
 ( 
 	int limit, 
 	int ( * hash ) ( void *, int ),
@@ -66,7 +66,7 @@ HashMap mapBuild
 	return map;
 }
 
-void mapDestroy
+void mapClr
 (
 	HashMap map,
 	void ( * keyclr ) ( void * ),
@@ -102,7 +102,7 @@ void mapDestroy
 	map = NULL;
 }
 
-void mapIns 
+void mapInsert 
 ( 
 	HashMap map, 
 	void * key, void * value,
@@ -137,7 +137,7 @@ void mapIns
 
 		if ( map -> volume != 0 )
 		{
-			exis = RETR ( map, index );
+			exis = RETRV ( map, index );
 		}
 
 		if ( exis == NULL )
@@ -153,7 +153,7 @@ void mapIns
 
 				entryClr ( exis, keyclr, valclr );
 
-				INST ( map, index, entry );
+				INSRT ( map, index, entry );
 			}
 
 			else if ( 0 < increment )
@@ -172,7 +172,7 @@ void mapIns
 					
 					for ( int ix = 0; ix < olm; ix ++ )
 					{
-						Entry en = RETR ( map, ix );
+						Entry en = RETRV ( map, ix );
 
 						void * key = en -> key;
 						int newix = map -> hash ( key, limit );
@@ -224,9 +224,6 @@ void * mapRemk
 	return value;
 }
 
-/// Key clearing function for dynamically allocated char pointers.
-/// DO NOT use with statically allocated char pointers.
-
 void chpKeyclr ( char * chp )
 {
 	if ( chp != NULL ) {
@@ -234,10 +231,6 @@ void chpKeyclr ( char * chp )
 		chp = NULL;
 	}
 }
-
-/// Hash function for char pointer keys.
-/// Applies a power multiplier to character values 4 bytes at a time to expand the range of
-/// produced indices.
 
 int chpHash ( char * chp, int size )
 {
@@ -258,4 +251,14 @@ int chpHash ( char * chp, int size )
 	while ( ix < len );
 
 	return sum % size;
+}
+
+int intHash ( int * value, int size )
+{
+	return * value % size;
+}
+
+int intCmp ( int * a, int * b )
+{
+	return ( * a ) - ( * b );
 }

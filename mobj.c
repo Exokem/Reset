@@ -5,7 +5,7 @@
 Mobj mobjInst ( char idn[ IDN_LIM ], SDL_Rect rec, Root root )
 {
 	Mobj mobj = NULL;
-	mobj = malloc ( sizeof ( Mobj ) );
+	mobj = malloc ( sizeof ( struct mobj_s ) );
 
 	if ( mobj != NULL )
 	{
@@ -16,7 +16,7 @@ Mobj mobjInst ( char idn[ IDN_LIM ], SDL_Rect rec, Root root )
 
 		mobj -> mappings = NULL;
 		HashMap mappings = NULL;
-		mappings = mapBuild ( DIR_CRD, &chpHash, &strcmp );
+		mappings = mapInst ( DIR_CRD, &chpHash, &strcmp );
 
 		if ( root != NULL )
 		{
@@ -55,7 +55,7 @@ void mobjClr ( Mobj mobj )
 	// A clearing function for surfaces should not be required, surfaces should be managed
 	// externally by a resource eater.
 
-	if ( mobj -> mappings != NULL ) mapDestroy ( mobj -> mappings, NULL, NULL );
+	if ( mobj -> mappings != NULL ) mapClr ( mobj -> mappings, NULL, NULL );
 
 	free ( mobj );
 	mobj = NULL;
