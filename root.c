@@ -1,126 +1,141 @@
 
 #include "root.h"
+#include "renderer.h"
+#include "keyin.h"
+#include "cut.h"
 
 int main ( int argc, char * argv[] ) 
 {
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
 
-    // The window contains the surface.
+	// The window contains the surface.
 
-    Root root = NULL;
-    root = setup ();
-    terminateRoot ( root );
+	Root nlinst ( root, setup () );
+	SDL_Window * nlinst ( window, root -> window );
+	SDL_Surface * nlinst ( screenSurface, root -> screen );
+	SDL_Event ev;
 
-    //SDL_Window * window = NULL;
-    //window = root -> window;
+	Adjunct nlinst ( adj, adjunctInst ( 10, 0, 10, 10.0 ) );
 
-    //SDL_Surface * screenSurface = NULL; 
-    //screenSurface = root -> screen;
+	adjunctLink ( adj, 10, 0, 20, 10.0 );
 
-    //Mobj player = NULL;
-    //SDL_Rect player_rec = { 0, 0, 16, 16 };
-    //player = mobjInst ( "controlled", player_rec, root );
+	int delay = 0;
 
-    ////SDL_Surface * player_icon = mapAcck ( player -> mappings, "0" );
+	while ( 1 )
+	{
+		Vecdir motion = OO;
 
-    //SDL_Event ev;
+		while ( SDL_PollEvent ( &ev ) )
+		{
+			if ( ev.type == SDL_QUIT )
+			{
+				terminateRoot ( root );
 
-    //while ( 1 )
-    //{
-    //    while ( SDL_PollEvent ( &ev ) )
-    //    {
-    //        if ( ev.type == SDL_QUIT )
-    //        {
-    //            terminateRoot ( root );
+				_CrtDumpMemoryLeaks();
 
-    //            _CrtDumpMemoryLeaks();
+				return EXIT_SUCCESS;
+			}
 
-    //            return EXIT_SUCCESS;
-    //        }
-    //    }
+			else if ( ev.type == SDL_KEYDOWN )
+			{
+				ev.key.keysym.sym;
+			}
+		}
 
-    //    SDL_FillRect ( screenSurface, NULL, SDL_MapRGB ( screenSurface -> format, 0x00, 0x00, 0x00 ) );
+		if ( delay == 25 )
+		{
+			int numkeys = 0;
+			const Uint8 * keyStates = SDL_GetKeyboardState ( &numkeys );
+			motion = readKeyboardState ( numkeys, keyStates );
 
-    //    /*if ( player_icon != NULL )
-    //    {
-    //        SDL_BlitSurface ( player_icon, NULL, screenSurface, NULL );
-    //    }*/
+			delay = 0;
+		}
 
-    //    SDL_UpdateWindowSurface ( window );
-    //}
+		else
+		{
+			delay ++;
+		}
 
-    _CrtDumpMemoryLeaks ();
+		SDL_FillRect ( screenSurface, NULL, SDL_MapRGB ( screenSurface -> format, 0x00, 0x00, 0x00 ) );
 
-    return EXIT_SUCCESS;
+		adjunctMove ( adj, motion, 4.0 );
+		adjunctDebug ( adj, screenSurface );
+
+		SDL_UpdateWindowSurface ( window );
+	}
+
+	_CrtDumpMemoryLeaks ();
+
+	return EXIT_SUCCESS;
 }
 
 static SDL_Window * windowSetup ( int width, int height )
 {
-    // Attempt to initialize SDL and a window. Failures will shut down the program.
+	// Attempt to initialize SDL and a window. Failures will shut down the program.
 
-    if ( SDL_Init ( SDL_INIT_VIDEO ) < 0 )
-    {
-        fprintf ( stderr, "SDL initialization failure: %s\n", SDL_GetError () );
-        exit ( EXIT_FAILURE );
-    }
+	if ( SDL_Init ( SDL_INIT_VIDEO ) < 0 )
+	{
+		fprintf ( stderr, "SDL initialization failure: %s\n", SDL_GetError () );
+		exit ( EXIT_FAILURE );
+	}
 
-    if ( IMG_Init ( IMG_INIT_PNG ) != IMG_INIT_PNG )
-    {
-        fprintf ( stderr, "IMG initialization failure: PNG support uninitialized.\n");
-        exit ( EXIT_FAILURE );
-    }
+	if ( IMG_Init ( IMG_INIT_PNG ) != IMG_INIT_PNG )
+	{
+		fprintf ( stderr, "IMG initialization failure: PNG support uninitialized.\n");
+		exit ( EXIT_FAILURE );
+	}
 
-    SDL_Window * window = NULL;
-    window = SDL_CreateWindow
-    (
-        "Mired", 
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 
-        SDL_WINDOW_SHOWN
-    );
+	SDL_Window * window = NULL;
+	window = SDL_CreateWindow
+	(
+		"Mired", 
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 
+		SDL_WINDOW_SHOWN
+	);
 
-    if ( window == NULL )
-    {
-        fprintf(stderr, "Window creation failure: %s\n", SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
+	if ( window == NULL )
+	{
+		fprintf(stderr, "Window creation failure: %s\n", SDL_GetError());
+		exit(EXIT_FAILURE);
+	}
 
-    return window;
+	return window;
 }
 
 Root setup ()
 {
 	Root root = NULL;
-    root = malloc ( sizeof ( struct root_s ) );
+	root = malloc ( sizeof ( struct root_s ) );
 
-    if ( root == NULL ) return NULL;
+	if ( root == NULL ) return NULL;
 
 	root -> window = NULL;
-    root -> screen = NULL; 
-    root -> eater = NULL;
+	root -> screen = NULL; 
+	root -> eater = NULL;
 
-    root -> window = windowSetup ( WIN_HZ, WIN_VT );
-    printf ( "Successfully initialized window for display\n" );
-    root -> screen = SDL_GetWindowSurface ( root -> window );
-    root -> eater = defineEater();
-    printf ( "Designated resource eater\n" );
+	root -> window = windowSetup ( WIN_HZ, WIN_VT );
+	printf ( "Successfully initialized window for display\n" );
+	root -> screen = SDL_GetWindowSurface ( root -> window );
+	root -> eater = defineEater();
+	printf ( "Designated resource eater\n" );
 
-    return root;
+	return root;
 }
 
 ResourceEater defineEater ()
 {
-    ResourceEater eater = NULL;
+	ResourceEater eater = NULL;
 
-    eater = malloc ( sizeof ( struct res_eat_s ) );
+	eater = malloc ( sizeof ( struct res_eat_s ) );
 
-    if ( eater == NULL ) return NULL;
+	if ( eater == NULL ) return NULL;
 
-    eater -> surface_set = NULL;
-    eater -> surface_set = malloc ( 0 );
-    eater -> surfaces = 0;
+	eater -> surface_set = NULL;
+	eater -> surface_set = malloc ( 0 );
+	eater -> surfaces = 0;
 
-    return eater;
+	return eater;
 }
 
 void dismantleRoot ( Root root )
@@ -134,84 +149,84 @@ void dismantleRoot ( Root root )
 	root -> screen = NULL;
 	root -> eater = NULL;
 
-    free ( root );
-    root = NULL;
+	free ( root );
+	root = NULL;
 }
 
 void terminateRoot ( Root root )
 {
-    dismantleRoot ( root );
-    printf ( "Dismantled root data\n" );
+	dismantleRoot ( root );
+	printf ( "Dismantled root data\n" );
 
-    IMG_Quit();
-    printf ( "Closed SDL IMG\n" );
+	IMG_Quit();
+	printf ( "Closed SDL IMG\n" );
 
-    SDL_Quit();
-    printf ( "Closed SDL2\n" );
+	SDL_Quit();
+	printf ( "Closed SDL2\n" );
 }
 
 void trackSurface ( Root root, SDL_Surface * surface )
 {
-    ResourceEater eater = root -> eater;
+	ResourceEater eater = root -> eater;
 
-    if ( eater == NULL ) 
-    {
-        fprintf ( stderr, "Attempted to track resource with NULL eater.\n" );
-        return;
-    }
+	if ( eater == NULL ) 
+	{
+		fprintf ( stderr, "Attempted to track resource with NULL eater.\n" );
+		return;
+	}
 
-    SDL_Surface ** set = eater -> surface_set;
+	SDL_Surface ** set = eater -> surface_set;
 
-    if ( set == NULL )
-    {
-        fprintf ( stderr, "Attempted to track resource with malformed eater.\n");
-        return;
-    }
+	if ( set == NULL )
+	{
+		fprintf ( stderr, "Attempted to track resource with malformed eater.\n");
+		return;
+	}
 
-    SDL_Surface ** checker;
+	SDL_Surface ** checker;
 
-    eater -> surfaces ++;
+	eater -> surfaces ++;
 
-    checker = realloc 
-    (
-        set, 
-        eater -> surfaces * sizeof ( SDL_Surface )
-    );
+	checker = realloc 
+	(
+		set, 
+		eater -> surfaces * sizeof ( SDL_Surface )
+	);
 
-    if ( checker != NULL )
-    {
-        eater -> surface_set = checker;
-        eater -> surface_set[ eater -> surfaces - 1 ] = surface;
-    }
+	if ( checker != NULL )
+	{
+		eater -> surface_set = checker;
+		eater -> surface_set[ eater -> surfaces - 1 ] = surface;
+	}
 }
 
 void eat ( ResourceEater eater )
 {
-    if ( eater == NULL ) return;
+	if ( eater == NULL ) return;
 
-    if ( eater -> surface_set != NULL ) 
-    {
-        for ( size_t ix = 0; ix < eater -> surfaces; ix ++)
-        {
-            SDL_Surface * surface = NULL;
-            surface = eater -> surface_set[ ix ];
+	if ( eater -> surface_set != NULL ) 
+	{
+		for ( size_t ix = 0; ix < eater -> surfaces; ix ++)
+		{
+			SDL_Surface * surface = NULL;
+			surface = eater -> surface_set[ ix ];
 
-            if ( surface != NULL )
-            {
-                printf ( "Attempting to free surface set index %zu.\n", ix );
+			if ( surface != NULL )
+			{
+				printf ( "Attempting to free surface set index %zu.\n", ix );
 
-                SDL_FreeSurface ( surface );
-                surface = NULL;
-                eater -> surface_set[ ix ] = NULL;
-            }
-        }
+				SDL_FreeSurface ( surface );
+				surface = NULL;
+				eater -> surface_set[ ix ] = NULL;
+			}
+		}
 
-        free ( eater -> surface_set );
-        eater -> surface_set = NULL;
-    }
+		free ( eater -> surface_set );
+		eater -> surface_set = NULL;
+	}
 
-    free ( eater );
-    eater = NULL;
+	free ( eater );
+	eater = NULL;
 
-    printf ( "Resource Eater terminated.\n" );
+	printf ( "Resource Eater terminated.\n" );
 }
