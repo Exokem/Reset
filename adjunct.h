@@ -3,23 +3,37 @@
 #define _ADJUNCT_H
 
 #include "vecdir.h"
+#include "linear.h"
+#include "options.h"
 
 typedef struct adjunct_s
 {
-	int x; ///< Horizontal
-	int y; ///< Depth
-	int z; ///< Vertical
-	float limit;
+	double x; ///< Horizontal
+	double vx; ///< Horizontal Velocity
+	double ax; ///< Horizontal Acceleration
+
+	double y; ///< Depth
+
+	double z; ///< Vertical
+	double vz; ///< Vertical Velocity
+	double az; ///< Vertical Acceleration
+	double limit;
 	size_t links;
 	struct adjunct_s ** desc;
 } * Adjunct;
 
-Adjunct adjunctInst ( int, int, int, float );
+Adjunct adjunctInst ( double, double, double, double );
 
-void adjunctLink ( Adjunct, int, int, int, float );
+void adjunctLink ( Adjunct, double, double, double, double );
 
 void adjunctClr ( Adjunct );
 
-void adjunctMove ( Adjunct, Vecdir, float );
+void adjunctDirect ( Adjunct, Vecdir, float );
+
+void adjunctMove ( Adjunct );
+
+void adjSetAcceleration ( Adjunct, Vecdir, double );
+
+double adjunctDistance ( Adjunct, Adjunct );
 
 #endif

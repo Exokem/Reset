@@ -22,6 +22,8 @@ int main ( int argc, char * argv[] )
 
 	int delay = 0;
 
+	SDL_Renderer * renderer = root -> renderer;
+
 	while ( 1 )
 	{
 		Vecdir motion = OO;
@@ -43,11 +45,16 @@ int main ( int argc, char * argv[] )
 			}
 		}
 
-		if ( delay == 25 )
+		SDL_SetRenderDrawColor ( renderer, 0, 0, 0, 255 );
+		SDL_RenderClear ( renderer );
+
+		int numkeys = 0;
+		const Uint8 * keyStates = SDL_GetKeyboardState ( &numkeys );
+		motion = readKeyboardState ( numkeys, keyStates );
+
+		if ( delay == 1000 )
 		{
-			int numkeys = 0;
-			const Uint8 * keyStates = SDL_GetKeyboardState ( &numkeys );
-			motion = readKeyboardState ( numkeys, keyStates );
+			
 
 			delay = 0;
 		}
@@ -57,12 +64,10 @@ int main ( int argc, char * argv[] )
 			delay ++;
 		}
 
-		SDL_FillRect ( screenSurface, NULL, SDL_MapRGB ( screenSurface -> format, 0x00, 0x00, 0x00 ) );
-
-		adjunctMove ( adj, motion, 4.0 );
-		adjunctDebug ( adj, screenSurface );
-
-		SDL_UpdateWindowSurface ( window );
+		adjSetAcceleration ( adj, motion, 3.0 );
+		adjunctMove ( adj );
+		adjDbg ( adj, root );
+		SDL_RenderPresent ( renderer );
 	}
 
 	_CrtDumpMemoryLeaks ();
@@ -112,11 +117,13 @@ Root setup ()
 
 	root -> window = NULL;
 	root -> screen = NULL; 
+	root -> renderer = NULL;
 	root -> eater = NULL;
 
 	root -> window = windowSetup ( WIN_HZ, WIN_VT );
 	printf ( "Successfully initialized window for display\n" );
 	root -> screen = SDL_GetWindowSurface ( root -> window );
+	root -> renderer = SDL_CreateRenderer ( root -> window, -1, SDL_RENDERER_ACCELERATED );
 	root -> eater = defineEater();
 	printf ( "Designated resource eater\n" );
 
@@ -141,12 +148,14 @@ ResourceEater defineEater ()
 void dismantleRoot ( Root root )
 {
 	if ( root == NULL ) return;
+	SDL_DestroyRenderer ( root -> renderer );
 	SDL_DestroyWindow ( root -> window );
 	SDL_FreeSurface ( root -> screen );
 	if ( root -> eater != NULL ) eat ( root -> eater );
 
 	root -> window = NULL;
 	root -> screen = NULL;
+	root -> renderer = NULL;
 	root -> eater = NULL;
 
 	free ( root );

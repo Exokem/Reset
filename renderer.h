@@ -7,4 +7,6 @@
 
 void adjunctDebug ( Adjunct, SDL_Surface * );
 
+void adjDbg ( Adjunct, Root );
+
 #endif

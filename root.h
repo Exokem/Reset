@@ -10,10 +10,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#ifndef _DEFAULT_DIM_
+#include "options.h"
 
-#define WIN_HZ 1920
-#define WIN_VT 1080
+#ifndef _DEFAULT_DIM_
 
 #endif
 
@@ -37,6 +36,7 @@ typedef struct root_s
 {
 	SDL_Window * window; ///< The program window. 
 	SDL_Surface * screen; ///< The program window surface.
+	SDL_Renderer * renderer; ///< The program renderer.
 	ResourceEater eater; ///< The resource eater for the program.
 } * Root;
 
