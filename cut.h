@@ -20,4 +20,6 @@
 			inst = malloc ( sizeof ( struct stid ) * amt )
 #define foreach( set, size ) for ( int ix = 0; ix < size; ix ++ )
 
+#define nulret( val, ret ) if ( val == NULL ) { return ret; }
+
 #endif
