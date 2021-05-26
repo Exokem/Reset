@@ -107,8 +107,6 @@ void adjunctMove ( Adjunct adj )
 	adj -> x += dx;
 	adj -> vx = vx;
 
-	
-
 	nullck ( adj -> desc );
 
 	foreach ( adj -> desc, adj -> links )
@@ -117,8 +115,7 @@ void adjunctMove ( Adjunct adj )
 		
 		if ( next )
 		{
-			//double distance = adjunctDistance ( adj, next );
-			//if ( distance < adj -> limit ) adjunctMove ( next );
+			adjunctMove ( next );
 		}
 	}
 }
