@@ -52,18 +52,6 @@ int main ( int argc, char * argv[] )
 		const Uint8 * keyStates = SDL_GetKeyboardState ( &numkeys );
 		motion = readKeyboardState ( numkeys, keyStates );
 
-		if ( delay == 1000 )
-		{
-			
-
-			delay = 0;
-		}
-
-		else
-		{
-			delay ++;
-		}
-
 		adjSetAcceleration ( adj, motion, 3.0 );
 		adjunctMove ( adj );
 		adjDbg ( adj, root );

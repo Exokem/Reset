@@ -8,6 +8,8 @@
 
 typedef struct adjunct_s
 {
+	int dx;
+
 	double x; ///< Horizontal
 	double vx; ///< Horizontal Velocity
 	double ax; ///< Horizontal Acceleration
