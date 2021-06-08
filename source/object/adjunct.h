@@ -8,19 +8,25 @@
 
 typedef struct adjunct_s
 {
-	int dx;
+	int motion_x;
 
-	double x; ///< Horizontal
-	double vx; ///< Horizontal Velocity
-	double ax; ///< Horizontal Acceleration
+	double mass;
+
+	double pos_x; ///< Horizontal
+	double vel_x; ///< Horizontal Velocity
+	double acc_x; ///< Horizontal Acceleration
+	double force_x; ///< Horizontal Net Force
 
 	double y; ///< Depth
 
-	double z; ///< Vertical
-	double vz; ///< Vertical Velocity
-	double az; ///< Vertical Acceleration
+	double pos_z; ///< Vertical
+	double vel_z; ///< Vertical Velocity
+	double acc_z; ///< Vertical Acceleration
+	double force_z; ///< Vertical Net Force
 	double limit;
+
 	size_t links;
+
 	struct adjunct_s ** desc;
 } * Adjunct;
 
@@ -30,11 +36,11 @@ void adjunctLink ( Adjunct, double, double, double, double );
 
 void adjunctClr ( Adjunct );
 
-void adjunctDirect ( Adjunct, Vecdir, float );
-
 void adjunctMove ( Adjunct );
 
 void adjSetAcceleration ( Adjunct, Vecdir, double );
+
+void adjSetForce ( Adjunct, Vecdir, double );
 
 double adjunctDistance ( Adjunct, Adjunct );
 

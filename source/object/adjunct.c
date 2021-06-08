@@ -9,20 +9,23 @@ Adjunct adjunctInst ( double x, double y, double z, double limit )
 
 	nlcknl ( adjunct );
 
-	adjunct -> dx = 0;
+	adjunct -> motion_x = 0;
 
-	adjunct -> x = x;
-	adjunct -> vx = 0;
-	adjunct -> ax = 0;
+	adjunct -> mass = 1; // kg
+
+	adjunct -> pos_x = x;
+	adjunct -> vel_x = 0;
+	adjunct -> acc_x = 0;
+	adjunct -> force_x = 0;
 
 	adjunct -> y = y;
 
-	adjunct -> z = z;
-	adjunct -> vz = 0;
-	adjunct -> az = GRAVITY;
+	adjunct -> pos_z = z;
+	adjunct -> vel_z = 0;
+	adjunct -> acc_z = 0;
+	adjunct -> force_z = GRAVITY * adjunct -> mass;
 
 	adjunct -> limit = limit;
-
 	adjunct -> links = 0;
 
 	sizeinst ( adjunct -> desc, adjunct_s, adjunct -> links );
@@ -66,7 +69,7 @@ void adjunctClr ( Adjunct adjunct )
 
 	if ( adjunct -> desc != NULL )
 	{
-		for ( int ix = 0; ix < adjunct -> links; ix ++ )
+		for ( size_t ix = 0; ix < adjunct -> links; ix ++ )
 		{
 			adjunctClr ( adjunct -> desc[ ix ] );
 		}
@@ -81,20 +84,20 @@ void adjunctMove ( Adjunct adj )
 {
 	nullck ( adj );
 
-	double dz = adj -> vz * TIME_SCALE;
-	double dvz = adj -> az * TIME_SCALE;
+	double dz = adj -> vel_z * TIME_SCALE;
+	double dvz = adj -> acc_z * TIME_SCALE;
 
-	adj -> z += dz;
-	adj -> vz += dvz;
+	adj -> pos_z += dz;
+	adj -> vel_z += dvz;
 
-	adj -> vz = min ( adj -> vz, TERMINAL );
-	adj -> z = min ( adj -> z, WIN_VT );
+	adj -> vel_z = min ( adj -> vel_z, TERMINAL );
+	adj -> pos_z = min ( adj -> pos_z, WIN_VT );
 
-	double dx = adj -> vx * TIME_SCALE; // Delta x
-	double dvx = adj -> ax * TIME_SCALE; // Delta v in the x direction
-	double fx = - adj -> dx * FRICTION * TIME_SCALE;
+	double dx = adj -> vel_x * TIME_SCALE; // Delta x
+	double dvx = adj -> acc_x * TIME_SCALE; // Delta v in the x direction
+	double fx = - adj -> motion_x * FRICTION * TIME_SCALE;
 
-	double vx = adj -> vx + dvx;
+	double vx = adj -> vel_x + dvx;
 
 	if ( vx == 0 ) fx = 0;
 
@@ -102,10 +105,10 @@ void adjunctMove ( Adjunct adj )
 	else if ( vx < 0 && 0 < vx + fx ) vx = 0;
 	else vx += fx;
 
-	printf ( "velocity: %f\nacceleration: %f\nfriction: %f\n", adj -> vx, dvx, fx );
+	printf ( "velocity: %f\nacceleration: %f\nfriction: %f\n", adj -> vel_x, dvx, fx );
 
-	adj -> x += dx;
-	adj -> vx = vx;
+	adj -> pos_x += dx;
+	adj -> vel_x = vx;
 
 	nullck ( adj -> desc );
 
@@ -124,35 +127,21 @@ void adjSetAcceleration ( Adjunct adj, Vecdir vd, double acc )
 {
 	nullck ( adj );
 
-	if ( 0 < adj -> vx ) adj -> dx = 1;
-	else if ( adj -> vx < 0 ) adj -> dx = -1;
+	if ( 0 < adj -> vel_x ) adj -> motion_x = 1;
+	else if ( adj -> vel_x < 0 ) adj -> motion_x = -1;
 
 	// double friction = ndx * FRICTION;
 
-	adj -> ax = vd.vx * acc;
-	adj -> az = ( vd.vz * acc ) + GRAVITY;
+	adj -> acc_x = vd.vx * acc;
+	adj -> acc_z = ( vd.vz * acc ) + GRAVITY;
 
 	// if ( MAX_VX <= adj -> vx ) adj -> ax = friction;
 }
 
-void adjunctDirect ( Adjunct adj, Vecdir vd, float dist )
+void adjSetForce ( Adjunct adj, Vecdir vd, double force )
 {
-	nullck ( adj );
-
-	int dx = ( int ) ( vd.vx * dist );
-	int dy = ( int ) ( vd.vy * dist );
-	int dz = ( int ) ( vd.vz * dist );
-
-	adj -> x += dx;
-	adj -> y += dy;
-	adj -> z += dz;
-
-	nullck ( adj -> desc );
-
-	foreach ( adj -> desc, adj -> links )
-	{
-		adjunctDirect ( adj -> desc[ ix ], vd, dist );
-	}
+	adj -> force_x = vd.vx * force;
+	adj -> force_z = vd.vz * force;
 }
 
 static void moveTowards ( Adjunct adjDest, Adjunct adj )
@@ -165,9 +154,9 @@ double adjunctDistance ( Adjunct adj1, Adjunct adj2 )
 	nulret ( adj1, 0.0 );
 	nulret ( adj2, 0.0 );
 
-	double dx = ( double ) adj1 -> x - ( double ) adj2 -> x;
+	double dx = ( double ) adj1 -> pos_x - ( double ) adj2 -> pos_x;
 	double dy = ( double ) adj1 -> y - ( double ) adj2 -> y;
-	double dz = ( double ) adj1 -> z - ( double ) adj2 -> z;
+	double dz = ( double ) adj1 -> pos_z - ( double ) adj2 -> pos_z;
 
 	return pow ( ( pow ( dx, 2 ) + pow ( dy, 2 ) + pow ( dz, 2 ) ), 0.5 );
 }

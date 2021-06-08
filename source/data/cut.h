@@ -18,7 +18,7 @@
 #define neqact( val1, val2, act ) if ( val1 != val2 ) { act; }
 #define sizeinst( inst, stid, amt ) inst = NULL;\
 			inst = malloc ( sizeof ( struct stid ) * amt )
-#define foreach( set, size ) for ( int ix = 0; ix < size; ix ++ )
+#define foreach( set, size ) for ( size_t ix = 0; ix < size; ix ++ )
 
 #define nulret( val, ret ) if ( val == NULL ) { return ret; }
 
