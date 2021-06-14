@@ -24,6 +24,9 @@
 // Simple incremented loop header for unsigned indices
 #define fori( size ) for ( size_t ix = 0; ix < size; ix ++ )
 
+// Simple incremented loop header for unsigned indices with specified index variable
+#define forv( size, var ) for ( size_t var = 0; var < size; var ++ )
+
 // Simple incremented loop header for signed indices
 #define forsi( size ) for ( int ix = 0; ix < size; ix ++ )
 
