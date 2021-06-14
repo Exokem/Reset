@@ -7,6 +7,10 @@
 
 int main ( int argc, char ** argv )
 {
+    fprintf ( stderr, "Received %d argument%s:\n", argc, argc == 1 ? "" : "s" );
+
+    forsi ( argc ) fprintf ( stderr, "\t%s\n", argv [ ix ] );
+
     CFG_WIN cfg =
     {
         1920, 1080,
@@ -18,7 +22,7 @@ int main ( int argc, char ** argv )
 
     DATA_WIN display = r_dispset ( cfg );
 
-    Rrcon * rrcon = rrcon_inst ();
+    RRCON rrcon = rrcon_inst ();
     register_directory ( "tile" );
     // rrcon_import_sf ( rrcon, "grass", "grass.png" );
 
