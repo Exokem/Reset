@@ -3,6 +3,10 @@
 #include "rsetup.h"
 #include "rrcon.h"
 #include "provider.h"
+#include "rfocus.h"
+#include "rvector.h"
+#include "rtilemap.h"
+
 #undef main
 
 int main ( int argc, char ** argv )
@@ -24,7 +28,16 @@ int main ( int argc, char ** argv )
 
     RRCON rrcon = rrcon_inst ();
     register_directory ( "tile" );
-    // rrcon_import_sf ( rrcon, "grass", "grass.png" );
+    rrcon_import_sf ( rrcon, "grass", "grass.png" );
+
+    RTILEMAP tilemap = rtilemap_static ();
+    RTILE tile = rtile_inst ( "grass" );
+
+    VEC2I pos = { 0, 0 };
+    VEC2I pos2 = { 63, 63 };
+
+    rtilemap_set ( tilemap, tile, pos );
+    rtilemap_set ( tilemap, tile, pos2 );
 
     // SDL_Surface * grass = rrcon_retrieve_sf ( rrcon, "grass" );
 
@@ -53,6 +66,26 @@ int main ( int argc, char ** argv )
 
         // SDL_SetRenderDrawColor ( display.renderer, 0, 0, 0, 255 );
         SDL_RenderClear ( display.renderer );
+
+        forv ( tilemap -> xdim, ix ) forv ( tilemap -> ydim, iy )
+        {
+            VEC2I vector = { ix, iy };
+
+            RTILE rtile = rtilemap_tile ( tilemap, vector );
+
+            if ( rtile )
+            {
+                SDL_Surface * surface = rrcon_retrieve_sf ( rrcon, rtile -> rkey );
+
+                if ( surface )
+                {
+                    SDL_Texture * texture = SDL_CreateTextureFromSurface ( display.renderer, surface );
+                    SDL_Rect destination = { 16 * ix, 16 * iy, 16, 16 };
+                    SDL_RenderCopy ( display.renderer, texture, NULL, &destination );
+                }
+            }
+        }
+
         // SDL_RenderCopy ( display.renderer, grass_texture, NULL, NULL );
         SDL_RenderPresent ( display.renderer );
     }
