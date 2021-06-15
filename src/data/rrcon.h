@@ -172,4 +172,6 @@ SDL_Surface * rrcon_retrieve_sf ( RRCON, char * );
 
 SDL_Texture * rrcon_retrieve_tx ( RRCON, char * );
 
+SDL_Texture * rrcon_retrieve ( RRCON, char * );
+
 #endif // _RRCON_H

@@ -122,6 +122,7 @@ RRCON rrcon_inst ( SDL_Renderer * renderer, ResourceType resv )
     rrcon -> entry_size = 0;
     rrcon -> entry_limit = size;
     rrcon -> renderer = renderer;
+    rrcon -> res_type = resv;
 
     if ( resv == SURFACE )
     {
@@ -214,6 +215,13 @@ void rrcon_import ( RRCON rrcon, char * key, char * path )
         }
     }
 
+    fprintf
+    (
+        stderr,
+        "Found valid ResourceType '%d' for RRCON import operation.\n",
+        rrcon -> res_type
+    );
+
     if ( rrcon -> entry_size == rrcon -> entry_limit && !rrcon_inc ( rrcon ) ) return;
 
     size_t index = hash_str ( rrcon -> entry_limit, key );
@@ -271,10 +279,10 @@ void rrcon_clr ( RRCON rrcon )
 
 SDL_Surface * rrcon_retrieve_sf ( RRCON rrcon, char * key )
 {
-    if ( rrcon -> res_type == TEXTURE ) return NULL;
-
     retnulv ( rrcon, NULL );
     retnulv ( key, NULL );
+
+    if ( rrcon -> res_type == TEXTURE ) return NULL;
 
     size_t index = hash_str ( rrcon -> entry_limit, key );
 
@@ -286,17 +294,17 @@ SDL_Surface * rrcon_retrieve_sf ( RRCON rrcon, char * key )
         return NULL;
     }
 
-    fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
+//    fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
 
     return entry -> surface;
 }
 
 SDL_Texture * rrcon_retrieve_tx ( RRCON rrcon, char * key )
 {
-    if ( rrcon -> res_type == SURFACE ) return NULL;
-
     retnulv ( rrcon, NULL );
     retnulv ( key, NULL );
+
+    if ( rrcon -> res_type == SURFACE ) return NULL;
 
     size_t index = hash_str ( rrcon -> entry_limit, key );
 
@@ -308,7 +316,31 @@ SDL_Texture * rrcon_retrieve_tx ( RRCON rrcon, char * key )
         return NULL;
     }
 
-    fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
+//    fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
 
     return entry -> texture;
+}
+
+SDL_Texture * rrcon_retrieve ( RRCON rrcon, char * key )
+{
+    retnulv ( rrcon, NULL );
+    retnulv ( key, NULL );
+
+    SDL_Texture * texture = NULL;
+
+    if ( rrcon -> res_type == SURFACE )
+    {
+        SDL_Surface * surface = rrcon_retrieve_sf ( rrcon, key );
+
+        texture = SDL_CreateTextureFromSurface ( rrcon -> renderer, surface );
+
+        SDL_FreeSurface ( surface );
+    }
+
+    else if ( rrcon -> res_type == TEXTURE )
+    {
+        texture = rrcon_retrieve_tx ( rrcon, key );
+    }
+
+    return texture;
 }
