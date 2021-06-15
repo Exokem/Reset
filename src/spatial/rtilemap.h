@@ -20,6 +20,10 @@
 #define DEFAULT_SRTILEMAP_YDIM 255
 #endif // DEFAULT_RTILEMAP_YDIM
 
+#ifndef DEFAULT_RTILEMAP_TILEDIM
+#define DEFAULT_RTILEMAP_TILEDIM 16
+#endif // DEFAULT_RTILEMAP_TILEDIM
+
 /// rtile_s
 ///
 /// The data container for individual tiles in a tilemap.
@@ -38,6 +42,7 @@ typedef struct rtile_s
 typedef struct rtilemap_s
 {
     size_t xdim, ydim; ///< Horizontal and vertical dimensions of the tilemap.
+    size_t size;
     int dynamic; ///< State indicator for whether the tilemap is dynamic or static.
 
     union tiles
@@ -108,6 +113,8 @@ RTILE rtilemap_tile ( RTILEMAP, VEC2U );
 /// @return The RTILE previously located in the updated space.
 
 RTILE rtilemap_set ( RTILEMAP, RTILE, VEC2U );
+
+void rtilemap_render_tiles ( RTILEMAP, RRCON, VEC2I, double );
 
 /// rtilemap_clr
 ///

@@ -15,7 +15,12 @@ static size_t linearize_vector ( RTILEMAP tilemap, VEC2U vector )
 {
     retnulv ( tilemap, 0 );
 
-    return vector.a + ( vector.b * tilemap -> xdim );
+    return vector.b + ( vector.a * tilemap -> xdim );
+}
+
+static VEC2U delinearize_vector ( RTILEMAP tilemap, size_t index )
+{
+    return ( VEC2U ) { .b = index % tilemap -> xdim, .a = ( int ) ( index / tilemap -> xdim ) };
 }
 
 /// Dynamic RTILEMAPs may be simply resized without affecting their content. If the
@@ -35,6 +40,7 @@ RTILEMAP rtilemap_dynamic ( size_t xdim, size_t ydim )
 
     size_t size = xdim * ydim;
 
+    tilemap -> size = size;
     tilemap -> tiles.dy = minst ( rtile_s, size );
 
     retnulv ( tilemap -> tiles.dy, NULL );
@@ -58,6 +64,7 @@ RTILEMAP rtilemap_static ( void )
     tilemap -> xdim = DEFAULT_SRTILEMAP_XDIM;
     tilemap -> ydim = DEFAULT_SRTILEMAP_YDIM;
     tilemap -> tiles.dy = NULL;
+    tilemap -> size = tilemap -> xdim * tilemap -> ydim;
 
     forv ( tilemap -> xdim, ix ) forv ( tilemap -> ydim, iy )
     {
@@ -130,6 +137,49 @@ RTILE rtilemap_set ( RTILEMAP tilemap, RTILE tile, VEC2U vector )
     }
 
     return removed;
+}
+
+void rtilemap_render_tiles ( RTILEMAP tilemap, RRCON rrcon, VEC2I start, double scale )
+{
+    retnul ( tilemap );
+    retnul ( rrcon );
+    retnul ( rrcon -> renderer );
+
+    int tiledim = ( int ) ( ( double ) DEFAULT_RTILEMAP_TILEDIM * scale );
+
+    forv ( tilemap -> xdim, ix ) forv ( tilemap -> ydim, iy )
+    {
+        RTILE tile = NULL;
+        VEC2U vec = { ix, iy };
+
+        if ( !tilemap -> dynamic )
+        {
+            tile = tilemap -> tiles.st [ ix ] [ iy ];
+        }
+
+        else if ( tilemap -> tiles.dy )
+        {
+            size_t index = linearize_vector ( tilemap, vec );
+            tile = tilemap -> tiles.dy [ index ];
+        }
+
+        ifnnul ( tile )
+        {
+            SDL_Texture * texture = rrcon_retrieve ( rrcon, tile -> rkey );
+
+            ifnnul ( texture )
+            {
+                SDL_Rect dest =
+                {
+                    start.a + ( int ) ( vec.a * tiledim ),
+                    start.b + ( int ) ( vec.b * tiledim ),
+                    tiledim, tiledim
+                };
+
+                SDL_RenderCopy ( rrcon -> renderer, texture, NULL, &dest );
+            }
+        }
+    }
 }
 
 /// While the RTILEMAP is cleared, its RTILEs are set to NULL to account for cases
