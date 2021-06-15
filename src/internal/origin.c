@@ -69,9 +69,6 @@ int main ( int argc, char ** argv )
         // SDL_SetRenderDrawColor ( display.renderer, 0, 0, 0, 255 );
         SDL_RenderClear ( display.renderer );
 
-        SDL_Surface * surface = NULL;
-        SDL_Texture * texture = NULL;
-
         rtilemap_render_tiles ( tilemap, rrcon, tilemap_start, 1.0 );
 
         SDL_RenderPresent ( display.renderer );

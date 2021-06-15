@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// SHORTCUT
+// SHORTCUTS
 #include "shorts.h"
 
 #endif // _DEPN_H

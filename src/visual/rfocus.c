@@ -64,21 +64,6 @@ void rfocus_translate ( RFOCUS rfocus, VEC3I tvec )
 void rfocus_clr ( RFOCUS rfocus )
 {
     retnul ( rfocus );
-
-    switch ( rfocus -> focus_mode )
-    {
-        case F_FLAT_TILEMAP:
-        {
-            rtilemap_clr ( rfocus -> content.tilemap );
-            break;
-        }
-        case F_LAYERED_TILEMAP:
-        {
-            rlevelmap_clr ( rfocus -> content.levelmap );
-            break;
-        }
-    }
-
     free ( rfocus );
     rfocus = NULL;
 }

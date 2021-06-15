@@ -18,9 +18,6 @@
 // Generic typed array allocation
 #define mxalloc( type, amount ) malloc ( sizeof ( type ) * amount );
 
-// Array based increment
-#define foreach( type, var, set, size ) for ( size_t ix = 0, type var = set [ ix ]; ix < size; var = set [ ++ ix ] )
-
 // Simple incremented loop header for unsigned indices
 #define fori( size ) for ( size_t ix = 0; ix < size; ix ++ )
 
@@ -30,8 +27,10 @@
 // Simple incremented loop header for signed indices
 #define forsi( size ) for ( int ix = 0; ix < size; ix ++ )
 
+// NULL check shortcut
 #define ifnul( ptr ) if ( ptr == ( void * ) 0 )
 
+// NONNULL check shortcut
 #define ifnnul( ptr ) if ( ptr != ( void * ) 0 )
 
 // Pointer dereference

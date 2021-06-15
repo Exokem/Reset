@@ -20,6 +20,7 @@
 #define DEFAULT_SRTILEMAP_YDIM 255
 #endif // DEFAULT_RTILEMAP_YDIM
 
+// Default dimension for rendered tiles. Tiles are square.
 #ifndef DEFAULT_RTILEMAP_TILEDIM
 #define DEFAULT_RTILEMAP_TILEDIM 16
 #endif // DEFAULT_RTILEMAP_TILEDIM
@@ -42,7 +43,7 @@ typedef struct rtile_s
 typedef struct rtilemap_s
 {
     size_t xdim, ydim; ///< Horizontal and vertical dimensions of the tilemap.
-    size_t size;
+    size_t size; ///< The total number of tiles in the tilemap.
     int dynamic; ///< State indicator for whether the tilemap is dynamic or static.
 
     union tiles
@@ -113,6 +114,17 @@ RTILE rtilemap_tile ( RTILEMAP, VEC2U );
 /// @return The RTILE previously located in the updated space.
 
 RTILE rtilemap_set ( RTILEMAP, RTILE, VEC2U );
+
+/// rtilemap_render_tiles
+///
+/// Renders the tiles of an RTILEMAP. The rendering will begin at the position
+/// specified ( VEC2I ), and the tile dimensions can be scaled from the default value
+/// using a decimal value.
+///
+/// @param The RTILEMAP whose tiles will be rendered.
+/// @param The RRCON instance containing resources used by the tilemap.
+/// @param The signed integral vector position to begin rendering.
+/// @param The decimal scale multiplier used to modify tile dimensions.
 
 void rtilemap_render_tiles ( RTILEMAP, RRCON, VEC2I, double );
 

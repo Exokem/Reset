@@ -16,20 +16,17 @@
 
 // The default surface increment count. This value will be multiplied by the increment
 // amount ( RRCON_SF_INCREMENT ) when the initial capacity of an RRCON is determined.
-
 #ifndef RRCON_SF_DEFAULT
 #define RRCON_SF_DEFAULT 1
 #endif // RRCON_SF_DEFAULT
 
 // The default surface increment amount. This value specifies how many resource spaces
 // will be added when an RRCON reaches its capacity.
-
 #ifndef RRCON_SF_INCREMENT
 #define RRCON_SF_INCREMENT 8
 #endif // RRCON_INCREMENT
 
 // The default maximum size of keys used ( number of characters ).
-
 #ifndef RRCON_MAX_KEY
 #define RRCON_MAX_KEY 63
 #endif // RRCON_MAX_KEY
@@ -171,6 +168,15 @@ SDL_Surface * rrcon_retrieve_sf ( RRCON, char * );
 /// @return A NULLABLE SDL_Texture pointer representing the resolved texture resource.
 
 SDL_Texture * rrcon_retrieve_tx ( RRCON, char * );
+
+/// rrcon_retrieve
+///
+/// A generic function for retrieving SDL_Texture pointers from RRCONs of any type.
+///
+/// @param The RRCON that will receive a resource query.
+/// @param The resource key.
+///
+/// @return A NULLABLE SDL_Texture pointer representing the resolved texture resource.
 
 SDL_Texture * rrcon_retrieve ( RRCON, char * );
 
