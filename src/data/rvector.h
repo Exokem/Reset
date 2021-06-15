@@ -10,6 +10,12 @@
 #ifndef _RVECTOR_H
 #define _RVECTOR_H
 
+#include <stdlib.h>
+
+#define cpvec2( type, src ) ( type ) { .a = src.a, .b = src.b };
+#define cpvec3( type, src ) ( type ) { .x = src.x, .y = src.y, .z = src.z };
+#define addvec3( type, v1, v2 ) ( type ) { .x = v1.x + v2.x, .y = v1.y + v2.y, .z = v1.z + v2.z };
+
 typedef struct int_vec2_s
 {
     int a, b;
