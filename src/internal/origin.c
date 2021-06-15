@@ -6,6 +6,7 @@
 #include "rfocus.h"
 #include "rvector.h"
 #include "rtilemap.h"
+#include "rlevelmap.h"
 
 #undef main
 
@@ -30,14 +31,21 @@ int main ( int argc, char ** argv )
     register_directory ( "tile" );
     rrcon_import ( rrcon, "grass", "grass.png" );
 
-    RTILEMAP tilemap = rtilemap_static ();
+    RTILEMAP tilemap = rtilemap_static ( );
+//    RTILEMAP tilemap = rtilemap_dynamic ( 72, 72 );
     RTILE tile = rtile_inst ( "grass" );
 
     VEC2U pos = { 0, 0 };
-    VEC2U pos2 = { 63, 63 };
+    VEC2U pos2 = { 63, 31 };
 
     rtilemap_set ( tilemap, tile, pos );
     rtilemap_set ( tilemap, tile, pos2 );
+
+//    RFOCUS focus = rfocus_inst ( F_FLAT_TILEMAP );
+//
+//    focus -> tilemap = tilemap;
+
+    VEC2I tilemap_start = { 30, 0 };
 
     SDL_Event ev;
 
@@ -47,7 +55,7 @@ int main ( int argc, char ** argv )
         {
             if ( ev.type == SDL_QUIT )
             {
-                rrcon_clr ( rrcon );
+//                rrcon_clr ( rrcon );
 
                 SDL_DestroyRenderer ( display.renderer );
                 SDL_DestroyWindow ( display.window );
@@ -64,39 +72,7 @@ int main ( int argc, char ** argv )
         SDL_Surface * surface = NULL;
         SDL_Texture * texture = NULL;
 
-        forv ( tilemap -> xdim, ix ) forv ( tilemap -> ydim, iy )
-        {
-            VEC2U vector = { ix, iy };
-
-            RTILE rtile = rtilemap_tile ( tilemap, vector );
-
-            if ( rtile )
-            {
-                if ( rrcon -> res_type == SURFACE )
-                {
-                    surface = rrcon_retrieve_sf ( rrcon, rtile -> rkey );
-
-                    ifnnul ( surface )
-                    {
-                        texture = SDL_CreateTextureFromSurface ( display.renderer, surface );
-                    }
-                }
-
-                else if ( rrcon -> res_type == TEXTURE )
-                {
-                    texture = rrcon_retrieve_tx ( rrcon, rtile -> rkey );
-                }
-
-                ifnnul ( texture )
-                {
-                    SDL_Rect destination = { 16 * ix, 16 * iy, 16, 16 };
-                    SDL_RenderCopy ( display.renderer, texture, NULL, &destination );
-                }
-
-                surface = NULL;
-                texture = NULL;
-            }
-        }
+        rtilemap_render_tiles ( tilemap, rrcon, tilemap_start, 1.0 );
 
         SDL_RenderPresent ( display.renderer );
     }
