@@ -30,6 +30,10 @@
 // Simple incremented loop header for signed indices
 #define forsi( size ) for ( int ix = 0; ix < size; ix ++ )
 
+#define ifnul( ptr ) if ( ptr == ( void * ) 0 )
+
+#define ifnnul( ptr ) if ( ptr != ( void * ) 0 )
+
 // Pointer dereference
 #define deref( ptr, var ) var = * ptr;
 

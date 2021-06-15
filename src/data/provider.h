@@ -50,6 +50,10 @@ void register_directory ( char * );
 ///
 /// @return A NULLABLE SDL_Surface pointer representing the located or missing resource.
 
-SDL_Surface * locate_resource ( char * );
+//SDL_Surface * locate_resource ( char * );
+
+SDL_Surface * locate_resource_sf ( char * );
+
+SDL_Texture * locate_resource_tx ( SDL_Renderer *, char * );
 
 #endif // _PROVIDER_H

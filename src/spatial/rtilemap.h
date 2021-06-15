@@ -92,7 +92,7 @@ RTILE rtile_inst ( char * );
 ///
 /// @return A NULLABLE RTILE representing the located or empty tile.
 
-RTILE rtilemap_tile ( RTILEMAP, VEC2I );
+RTILE rtilemap_tile ( RTILEMAP, VEC2U );
 
 /// rtilemap_set
 ///
@@ -107,7 +107,7 @@ RTILE rtilemap_tile ( RTILEMAP, VEC2I );
 ///
 /// @return The RTILE previously located in the updated space.
 
-RTILE rtilemap_set ( RTILEMAP, RTILE, VEC2I );
+RTILE rtilemap_set ( RTILEMAP, RTILE, VEC2U );
 
 /// rtilemap_clr
 ///

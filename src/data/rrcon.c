@@ -50,99 +50,186 @@ static int rrcon_inc ( RRCON rrcon )
 {
     retnulv ( rrcon, 0 );
 
-    size_t size = rrcon -> sf_entry_limit + RRCON_SF_INCREMENT;
-    SFEntry * adjusted = minst ( surface_entry_s, size ); // Allocate new expanded entry set.
+    size_t size = rrcon -> entry_limit + RRCON_SF_INCREMENT;
 
-    retnulv ( adjusted, 0 );
+    SFEntry * sf_adj = NULL;
+    TXEntry * tx_adj = NULL;
 
-    fori ( size )
+    switch ( rrcon -> res_type )
     {
-        adjusted [ ix ] = NULL;
-    }
-
-    fori ( rrcon -> sf_entry_limit ) // Rehash contents.
-    {
-        SFEntry entry = ixget ( rrcon -> sf_entries, ix );
-
-        if ( entry != NULL )
+        case SURFACE:
         {
-            size_t index = hash_str ( size, entry -> key );
-            adjusted [ index ] = entry;
+            sf_adj = minst ( surface_entry_s, size );
+            retnulv ( sf_adj, 0 );
+
+            fori ( size ) sf_adj [ ix ] = NULL;
+            fori ( rrcon -> entry_limit )
+            {
+                SFEntry entry = rrcon -> entries.sf [ ix ];
+                ifnnul ( entry )
+                {
+                    size_t index = hash_str ( size, entry -> key );
+                    sf_adj [ index ] = entry;
+                }
+            }
         }
+
+        case TEXTURE:
+        {
+            tx_adj = minst ( texture_entry_s, size );
+            retnulv ( tx_adj, 0 );
+
+            fori ( size ) tx_adj [ ix ] = NULL;
+            fori ( rrcon -> entry_limit )
+            {
+                TXEntry entry = rrcon -> entries.tx [ ix ];
+                ifnnul ( entry )
+                {
+                    size_t index = hash_str ( size, entry -> key );
+                    tx_adj [ index ] = entry;
+                }
+            }
+        }
+
+        default: return 0;
     }
 
-    free ( rrcon -> sf_entries );
-    rrcon -> sf_entries = adjusted;
+    ifnnul ( sf_adj )
+    {
+        free ( rrcon -> entries.sf );
+        rrcon -> entries.sf = sf_adj;
+    }
+
+    else ifnnul ( tx_adj )
+    {
+        free ( rrcon -> entries.tx );
+        rrcon -> entries.tx = tx_adj;
+    }
 
     return 1;
 }
 
-/// Provides a new RRCON instance.
-/// Returns NULL if rrcon or sf_entries cannot be allocated.
-
-RRCON rrcon_inst ()
+RRCON rrcon_inst ( SDL_Renderer * renderer, ResourceType resv )
 {
+    if ( resv == TEXTURE && renderer == NULL ) return NULL;
+
     RRCON rrcon = inst ( rrcon_s );
 
     retnulv ( rrcon, NULL );
 
     size_t size = RRCON_SF_DEFAULT * RRCON_SF_INCREMENT;
 
-    rrcon -> sf_entry_size = 0;
-    rrcon -> sf_entry_limit = size;
-    rrcon -> sf_entries = minst ( surface_entry_s, size );
+    rrcon -> entry_size = 0;
+    rrcon -> entry_limit = size;
+    rrcon -> renderer = renderer;
 
-    if ( rrcon -> sf_entries == NULL )
+    if ( resv == SURFACE )
     {
-        free ( rrcon );
-        return NULL;
+        rrcon -> entries.sf = minst ( surface_entry_s, size );
+
+        ifnul ( rrcon -> entries.sf )
+        {
+            free ( rrcon );
+            return NULL;
+        }
+
+        fori ( size ) rrcon -> entries.sf [ ix ] = NULL;
     }
 
-    fori ( RRCON_SF_INCREMENT )
+    else
     {
-        rrcon -> sf_entries [ ix ] = NULL;
+        rrcon -> entries.tx = minst ( texture_entry_s, size );
+
+        ifnul ( rrcon -> entries.tx )
+        {
+            free ( rrcon );
+            return NULL;
+        }
+
+        fori ( size ) rrcon -> entries.tx [ ix ] = NULL;
     }
 
     return rrcon;
 }
 
-/// Imports a resource with the provided path into the provided RRCON.
-
-void rrcon_import_sf ( RRCON pt_rrcon, char * key, char * path )
+void rrcon_import ( RRCON rrcon, char * key, char * path )
 {
-    retnul ( path ); // Cannot load resources from invalid paths.
-    retnul ( pt_rrcon );
+    retnul ( rrcon );
+    retnul ( key );
+    retnul ( path );
 
-    SDL_Surface * surface = locate_resource ( path );
+    SFEntry sf_entry = NULL;
+    TXEntry tx_entry = NULL;
 
-    if ( surface == NULL ) fprintf
-    (
-        stderr,
-        "Resource '%s' could not be loaded: %s\n",
-        path, IMG_GetError ()
-    );
-
-    else
+    switch ( rrcon -> res_type )
     {
-        if ( pt_rrcon -> sf_entry_size == pt_rrcon -> sf_entry_limit )
+        case SURFACE:
         {
-            if ( !rrcon_inc ( pt_rrcon ) )
+            // Load resource as SDL_Surface
+
+            SDL_Surface * surface = locate_resource_sf ( path );
+
+            ifnnul ( surface )
             {
-                SDL_FreeSurface ( surface );
-                return;
+                sf_entry = inst ( surface_entry_s );
+                ifnul ( sf_entry ) { SDL_FreeSurface ( surface ); return; }
+
+                strncpy ( sf_entry -> key, key, RRCON_MAX_KEY );
+                sf_entry -> surface = surface;
             }
+
+            break;
         }
 
-        SFEntry entry = inst ( surface_entry_s );
-        strncpy ( entry -> key, key, RRCON_MAX_KEY );
-        entry -> surface = surface;
+        case TEXTURE:
+        {
+            // Load resource as SDL_Texture
 
-        size_t index = hash_str ( pt_rrcon -> sf_entry_limit, key );
+            SDL_Texture * texture = locate_resource_tx ( rrcon -> renderer, path );
 
-        fprintf ( stderr, "Designated index '%u' for imported resource '%s'\n", index, path );
+            ifnnul ( texture )
+            {
+                tx_entry = inst ( texture_entry_s );
+                ifnul ( tx_entry ) { SDL_DestroyTexture ( texture ); return; }
 
-        pt_rrcon -> sf_entries [ index ] = entry;
-        pt_rrcon -> sf_entry_size ++;
+                strncpy ( tx_entry -> key, key, RRCON_MAX_KEY );
+                tx_entry -> texture = texture;
+            }
+
+            break;
+        }
+
+        default:
+        {
+            // Display warning output
+
+            fprintf
+            (
+                stderr,
+                "Failed to import resource for invalid ResourceType: %d",
+                rrcon -> res_type
+            );
+
+            return;
+        }
+    }
+
+    if ( rrcon -> entry_size == rrcon -> entry_limit && !rrcon_inc ( rrcon ) ) return;
+
+    size_t index = hash_str ( rrcon -> entry_limit, key );
+
+    fprintf ( stderr, "Designated index '%u' for imported resource '%s'\n", index, path );
+
+    ifnnul ( sf_entry )
+    {
+        ifnul ( rrcon -> entries.sf [ index ] ) rrcon -> entry_size ++;
+        rrcon -> entries.sf [ index ] = sf_entry;
+    }
+
+    else ifnnul ( tx_entry )
+    {
+        ifnul ( rrcon -> entries.tx [ index ] ) rrcon -> entry_size ++;
+        rrcon -> entries.tx [ index ] = tx_entry;
     }
 }
 
@@ -152,11 +239,11 @@ void rrcon_clr ( RRCON rrcon )
 {
     retnul ( rrcon );
 
-    if ( rrcon -> sf_entries != NULL )
+    fori ( rrcon -> entry_limit )
     {
-        fori ( rrcon -> sf_entry_limit )
+        ifnnul ( rrcon -> entries.sf )
         {
-            SFEntry entry = rrcon -> sf_entries [ ix ];
+            SFEntry entry = rrcon -> entries.sf [ ix ];
             if ( entry != NULL )
             {
                 SDL_FreeSurface ( entry -> surface );
@@ -164,7 +251,15 @@ void rrcon_clr ( RRCON rrcon )
             }
         }
 
-        free ( rrcon -> sf_entries );
+        else ifnnul ( rrcon -> entries.tx )
+        {
+            TXEntry entry = rrcon -> entries.tx [ ix ];
+            ifnnul ( entry )
+            {
+                SDL_DestroyTexture ( entry -> texture );
+                free ( entry );
+            }
+        }
     }
 
     free ( rrcon );
@@ -176,12 +271,14 @@ void rrcon_clr ( RRCON rrcon )
 
 SDL_Surface * rrcon_retrieve_sf ( RRCON rrcon, char * key )
 {
+    if ( rrcon -> res_type == TEXTURE ) return NULL;
+
     retnulv ( rrcon, NULL );
     retnulv ( key, NULL );
 
-    size_t index = hash_str ( rrcon -> sf_entry_limit, key );
+    size_t index = hash_str ( rrcon -> entry_limit, key );
 
-    SFEntry entry = rrcon -> sf_entries [ index ];
+    SFEntry entry = rrcon -> entries.sf [ index ];
 
     if ( entry == NULL )
     {
@@ -192,4 +289,26 @@ SDL_Surface * rrcon_retrieve_sf ( RRCON rrcon, char * key )
     fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
 
     return entry -> surface;
+}
+
+SDL_Texture * rrcon_retrieve_tx ( RRCON rrcon, char * key )
+{
+    if ( rrcon -> res_type == SURFACE ) return NULL;
+
+    retnulv ( rrcon, NULL );
+    retnulv ( key, NULL );
+
+    size_t index = hash_str ( rrcon -> entry_limit, key );
+
+    TXEntry entry = rrcon -> entries.tx [ index ];
+
+    if ( entry == NULL )
+    {
+        fprintf ( stderr, "Could not resolve entry for resource key '%s'\n", key );
+        return NULL;
+    }
+
+    fprintf ( stderr, "Resolved index '%u' for resource key '%s'\n", index, key );
+
+    return entry -> texture;
 }

@@ -99,7 +99,31 @@ void register_directory ( char * directory )
 
 /// Searches all registered directories for the named resource.
 
-SDL_Surface * locate_resource ( char * resource )
+//SDL_Surface * locate_resource ( char * resource )
+//{
+//    if ( !PROVIDER_INITIALIZED ) provider_init ();
+//
+//    if ( REGISTERED_DIRECTORIES == 0 ) return NULL;
+//
+//    retnulv ( resource, NULL );
+//
+//    SDL_Surface * surface = NULL;
+//
+//    fori ( REGISTERED_DIRECTORIES )
+//    {
+//        char * directory = DIRECTORY_INDEX [ ix ];
+//
+//        if ( directory != NULL )
+//        {
+//            surface = load_resource ( directory, resource );
+//            if ( surface != NULL ) return surface;
+//        }
+//    }
+//
+//    return NULL;
+//}
+
+SDL_Surface * locate_resource_sf ( char * resource )
 {
     if ( !PROVIDER_INITIALIZED ) provider_init ();
 
@@ -121,4 +145,17 @@ SDL_Surface * locate_resource ( char * resource )
     }
 
     return NULL;
+}
+
+SDL_Texture * locate_resource_tx ( SDL_Renderer * renderer, char * resource )
+{
+    SDL_Surface * surface = locate_resource_sf ( resource );
+
+    retnulv ( surface, NULL );
+
+    SDL_Texture * texture = SDL_CreateTextureFromSurface ( renderer, surface );
+
+    SDL_FreeSurface ( surface );
+
+    return texture;
 }

@@ -26,24 +26,18 @@ int main ( int argc, char ** argv )
 
     DATA_WIN display = r_dispset ( cfg );
 
-    RRCON rrcon = rrcon_inst ();
+    RRCON rrcon = rrcon_inst ( display.renderer, TEXTURE );
     register_directory ( "tile" );
-    rrcon_import_sf ( rrcon, "grass", "grass.png" );
+    rrcon_import ( rrcon, "grass", "grass.png" );
 
     RTILEMAP tilemap = rtilemap_static ();
     RTILE tile = rtile_inst ( "grass" );
 
-    VEC2I pos = { 0, 0 };
-    VEC2I pos2 = { 63, 63 };
+    VEC2U pos = { 0, 0 };
+    VEC2U pos2 = { 63, 63 };
 
     rtilemap_set ( tilemap, tile, pos );
     rtilemap_set ( tilemap, tile, pos2 );
-
-    // SDL_Surface * grass = rrcon_retrieve_sf ( rrcon, "grass" );
-
-    // if ( grass == NULL ) printf ("Invalid surface\n");
-
-    // SDL_Texture * grass_texture = SDL_CreateTextureFromSurface ( display.renderer, grass );
 
     SDL_Event ev;
 
@@ -67,26 +61,43 @@ int main ( int argc, char ** argv )
         // SDL_SetRenderDrawColor ( display.renderer, 0, 0, 0, 255 );
         SDL_RenderClear ( display.renderer );
 
+        SDL_Surface * surface = NULL;
+        SDL_Texture * texture = NULL;
+
         forv ( tilemap -> xdim, ix ) forv ( tilemap -> ydim, iy )
         {
-            VEC2I vector = { ix, iy };
+            VEC2U vector = { ix, iy };
 
             RTILE rtile = rtilemap_tile ( tilemap, vector );
 
             if ( rtile )
             {
-                SDL_Surface * surface = rrcon_retrieve_sf ( rrcon, rtile -> rkey );
-
-                if ( surface )
+                if ( rrcon -> res_type == SURFACE )
                 {
-                    SDL_Texture * texture = SDL_CreateTextureFromSurface ( display.renderer, surface );
+                    surface = rrcon_retrieve_sf ( rrcon, rtile -> rkey );
+
+                    ifnnul ( surface )
+                    {
+                        texture = SDL_CreateTextureFromSurface ( display.renderer, surface );
+                    }
+                }
+
+                else if ( rrcon -> res_type == TEXTURE )
+                {
+                    texture = rrcon_retrieve_tx ( rrcon, rtile -> rkey );
+                }
+
+                ifnnul ( texture )
+                {
                     SDL_Rect destination = { 16 * ix, 16 * iy, 16, 16 };
                     SDL_RenderCopy ( display.renderer, texture, NULL, &destination );
                 }
+
+                surface = NULL;
+                texture = NULL;
             }
         }
 
-        // SDL_RenderCopy ( display.renderer, grass_texture, NULL, NULL );
         SDL_RenderPresent ( display.renderer );
     }
 

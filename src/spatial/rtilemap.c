@@ -11,7 +11,7 @@
 ///
 /// @return The linear index produced.
 
-static size_t linearize_vector ( RTILEMAP tilemap, VEC2I vector )
+static size_t linearize_vector ( RTILEMAP tilemap, VEC2U vector )
 {
     retnulv ( tilemap, 0 );
 
@@ -81,7 +81,7 @@ RTILE rtile_inst ( char * key )
 
 /// NULL is returned for empty tiles, NULL RTILEMAPs, and out-of-bounds vectors.
 
-RTILE rtilemap_tile ( RTILEMAP tilemap, VEC2I vector )
+RTILE rtilemap_tile ( RTILEMAP tilemap, VEC2U vector )
 {
     retnulv ( tilemap, NULL );
 
@@ -105,7 +105,7 @@ RTILE rtilemap_tile ( RTILEMAP tilemap, VEC2I vector )
 /// NULL is returned for replacements of empty spaces, out-of-bounds vectors, and NULL
 /// dynamic tile containers.
 
-RTILE rtilemap_set ( RTILEMAP tilemap, RTILE tile, VEC2I vector )
+RTILE rtilemap_set ( RTILEMAP tilemap, RTILE tile, VEC2U vector )
 {
     retnulv ( tilemap, NULL );
 
