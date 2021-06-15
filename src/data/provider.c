@@ -38,10 +38,12 @@ static SDL_Surface * load_resource ( const char * directory, char * resource )
     fprintf
     (
         stderr,
-        "Resource '%s' %s.\n",
+        "'%s' %s.\n",
         path,
         surface == NULL ? "could not be loaded" : "loaded successfully"
     );
+
+    ifnul ( surface ) fprintf ( stderr, "\t%s\n", IMG_GetError () );
 
     return surface;
 }
@@ -96,32 +98,6 @@ void register_directory ( char * directory )
 
     fprintf ( stderr, "Successfully registered directory '%s'\n", directory );
 }
-
-/// Searches all registered directories for the named resource.
-
-//SDL_Surface * locate_resource ( char * resource )
-//{
-//    if ( !PROVIDER_INITIALIZED ) provider_init ();
-//
-//    if ( REGISTERED_DIRECTORIES == 0 ) return NULL;
-//
-//    retnulv ( resource, NULL );
-//
-//    SDL_Surface * surface = NULL;
-//
-//    fori ( REGISTERED_DIRECTORIES )
-//    {
-//        char * directory = DIRECTORY_INDEX [ ix ];
-//
-//        if ( directory != NULL )
-//        {
-//            surface = load_resource ( directory, resource );
-//            if ( surface != NULL ) return surface;
-//        }
-//    }
-//
-//    return NULL;
-//}
 
 SDL_Surface * locate_resource_sf ( char * resource )
 {
