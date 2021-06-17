@@ -1,4 +1,5 @@
 Makefile
 RESET.make
+RTEST.make
 bin/
 obj/

@@ -1,14 +1,7 @@
 
 //#define SDL_MAIN_HANDLED
 
-#include "depn.h"
-#include "rsetup.h"
-#include "rrcon.h"
-#include "rprovider.h"
-#include "rfocus.h"
-#include "rvector.h"
-#include "rtilemap.h"
-#include "rlevelmap.h"
+#include "RESET.h"
 
 #undef main
 
@@ -55,7 +48,7 @@ int main ( int argc, char ** argv )
 
     while ( 1 )
     {
-        if ( SDL_WaitEvent ( &ev ) )
+        if ( SDL_WaitEvent ( & ev ) )
         {
             if ( ev.type == SDL_QUIT )
             {
