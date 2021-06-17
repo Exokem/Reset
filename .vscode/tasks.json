@@ -1,0 +1,59 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PMK5 Generate x86",
+            "type": "shell",
+            "command": "./scripts/pmk86.bat",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "RESET Compile",
+            "type": "shell",
+            "command": "./scripts/b86.bat",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "RTEST Compile",
+            "type": "shell",
+            "command": "./scripts/b86_test.bat",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "RTEST Compile and Run",
+            "type": "shell",
+            "command": "./scripts/b86run_test.bat",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "dependsOn": ["RTEST Compile"]
+        },
+        {
+            "label": "RTEST Compile and Debug",
+            "type": "shell",
+            "command": "./scripts/b86debug_test.bat",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "dependsOn": ["RTEST Compile"]
+        }
+    ]
+}
