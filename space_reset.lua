@@ -14,18 +14,16 @@ workspace "SpaceReset"
     filter {}
 
 project "RESET"
-    kind "ConsoleApp"
+    kind "StaticLib"
     language "C"
-    targetdir "bin/%{cfg.buildcfg}_%{cfg.platform}"
-    targetname "reset"
+    targetdir "bin/RESET/%{cfg.buildcfg}_%{cfg.platform}"
+    targetname "RESET"
 
     files 
     { 
         "include/*.h",
-        "**.c", "**.h"
+        "src/**.c"
     }
-
-    -- removefiles { "test/**.c" }
 
     filter { "platforms:*32" }
 
@@ -42,21 +40,53 @@ project "RESET"
         "vendor/x86/SDL2_image/lib"
     }
 
-    -- filter { "platforms:*64" }
+    filter { "platforms:*64" }
     
-    -- includedirs 
-    -- { 
-    --     "include/reset", 
-    --     "vendor/SDL2/x86_64-w64-mingw32/include/SDL2",
-    --     "vendor/SDL2_image/x86_64-w64-mingw32/include/SDL2",
-    -- }
+    includedirs 
+    { 
+        "include/reset", 
+        "vendor/SDL2/x86_64-w64-mingw32/include/SDL2",
+        "vendor/SDL2_image/x86_64-w64-mingw32/include/SDL2",
+    }
 
-    -- libdirs
-    -- {
-    --     "vendor/SDL2/x86_64-w64-mingw32/lib/x64",
-    --     "vendor/SDL2_image/x86_64-w64-mingw32/lib/x64"
-    -- }
+    libdirs
+    {
+        "vendor/SDL2/x86_64-w64-mingw32/lib/x64",
+        "vendor/SDL2_image/x86_64-w64-mingw32/lib/x64"
+    }
 
     filter {}
 
     links { "SDL2", "SDL2main", "SDL2_image" }
+
+project "RTEST"
+    kind "ConsoleApp"
+    language "C"
+    targetdir "bin/RTEST/%{cfg.buildcfg}_%{cfg.platform}"
+    targetname "RTEST"
+
+    files
+    {
+        "test/**.h",
+        "test/**.c"
+    }
+
+    filter { "platforms:*32" }
+
+    includedirs 
+    { 
+        "include/reset", 
+        "vendor/x86/SDL2/include/SDL2",
+        "vendor/x86/SDL2_image/include/SDL2",
+    }
+
+    libdirs
+    {
+        "bin/RESET/Debug_x32",
+        "vendor/x86/SDL2/lib",
+        "vendor/x86/SDL2_image/lib"
+    }
+
+    filter {}
+
+    links { "RESET", "SDL2", "SDL2main", "SDL2_image" }
