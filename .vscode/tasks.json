@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "PMK5 Generate x86",
+            "label": "Generate x86 (PMK5)",
             "type": "shell",
             "command": "./scripts/pmk86.bat",
             "group": "test",
@@ -14,7 +14,7 @@
             }
         },
         {
-            "label": "RESET Compile",
+            "label": "Compile RESET",
             "type": "shell",
             "command": "./scripts/b86.bat",
             "group": "test",
@@ -24,7 +24,7 @@
             }
         },
         {
-            "label": "RTEST Compile",
+            "label": "Compile RTEST (Test Platform)",
             "type": "shell",
             "command": "./scripts/b86_test.bat",
             "group": "test",
@@ -34,7 +34,7 @@
             }
         },
         {
-            "label": "RTEST Compile and Run",
+            "label": "Execute RTEST (Test Platform)",
             "type": "shell",
             "command": "./scripts/b86run_test.bat",
             "group": "test",
@@ -42,10 +42,10 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "dependsOn": ["RTEST Compile"]
+            "dependsOn": ["Compile RTEST (Test Platform)"]
         },
         {
-            "label": "RTEST Compile and Debug",
+            "label": "Debug RTEST (Test Platform)",
             "type": "shell",
             "command": "./scripts/b86debug_test.bat",
             "group": "test",
@@ -53,7 +53,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "dependsOn": ["RTEST Compile"]
+            "dependsOn": ["Compile RTEST (Test Platform)"]
         }
     ]
 }
