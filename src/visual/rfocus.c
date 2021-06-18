@@ -35,22 +35,23 @@ void rfocus_render_content ( RFOCUS rfocus, RRCON rrcon )
     retnul ( rfocus );
     retnul ( rrcon );
 
+    VEC2I offset = { rfocus -> offset.x, rfocus -> offset.y };
+
     switch ( rfocus -> focus_mode )
     {
         case F_FLAT_TILEMAP:
         {
             retnul ( rfocus -> content.tilemap );
 
-
+            rtilemap_render_tiles ( rfocus -> content.tilemap, rrcon, offset, 1.0 );
         }
 
         case F_LAYERED_TILEMAP:
         {
-            retnul ( rfocus -> content.levelmap );
+            retnul ( rfocus -> content.level );
 
-
+            rlevel_render_levels ( rfocus -> content.level, rrcon, offset, 1.0 );
         }
-
     }
 }
 

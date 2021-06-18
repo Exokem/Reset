@@ -29,7 +29,6 @@ int main ( int argc, char ** argv )
     rrcon_import ( rrcon, "grass", "grass.png" );
 
     RTILEMAP tilemap = rtilemap_static ( );
-//    RTILEMAP tilemap = rtilemap_dynamic ( 72, 72 );
     RTILE tile = rtile_inst ( "grass" );
 
     VEC2U pos = { 0, 0 };
@@ -38,13 +37,15 @@ int main ( int argc, char ** argv )
     rtilemap_set ( tilemap, tile, pos );
     rtilemap_set ( tilemap, tile, pos2 );
 
-//    RFOCUS focus = rfocus_inst ( F_FLAT_TILEMAP );
-//
-//    focus -> tilemap = tilemap;
+    RFOCUS focus = rfocus_inst ( F_LAYERED_TILEMAP );
 
-    VEC2I tilemap_start = { 30, 0 };
+    RLEVEL level = rlevel_inst ( 1 );
+    level -> level_set [ 0 ] = tilemap;
+    focus -> content.level = level;
 
     SDL_Event ev;
+
+    VEC3I down = { 0, 20, 0 };
 
     while ( 1 )
     {
@@ -61,12 +62,20 @@ int main ( int argc, char ** argv )
 
                 return EXIT_SUCCESS;
             }
+
+            if ( ev.type == SDL_KEYDOWN )
+            {
+                if ( ev.key.keysym.sym == SDLK_s )
+                {
+                    rfocus_translate ( focus, down );
+                }
+            }
         }
 
         // SDL_SetRenderDrawColor ( display.renderer, 0, 0, 0, 255 );
         SDL_RenderClear ( display.renderer );
 
-        rtilemap_render_tiles ( tilemap, rrcon, tilemap_start, 1.0 );
+        rfocus_render_content ( focus, rrcon );
 
         SDL_RenderPresent ( display.renderer );
     }

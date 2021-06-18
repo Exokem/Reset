@@ -14,7 +14,7 @@
 #include "rrcon.h"
 
 #include "rtilemap.h"
-#include "rlevelmap.h"
+#include "rlevel.h"
 #include "rfocus.h"
 
 #endif // _RESET_H

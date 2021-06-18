@@ -8,8 +8,8 @@
 #define _DEPN_H
 
 // SDL
-#include "SDL.h"
-#include "SDL_image.h"
+#include <SDL.h>
+#include <SDL_image.h>
 
 // STDC
 #include <stdlib.h>

@@ -12,7 +12,7 @@
 #include "rrcon.h"
 #include "rvector.h"
 #include "rtilemap.h"
-#include "rlevelmap.h"
+#include "rlevel.h"
 
 /// rfocus_mode_e
 ///
@@ -39,7 +39,7 @@ typedef struct rfocus_s
     union content
     {
         RTILEMAP tilemap;   ///< RTILEMAP is used by any F_FLAT_TILEMAP RFOCUS.
-        RLEVELMAP levelmap; ///< RLEVELMAP is used by any F_LAYERED_TILEMAP RFOCUS.
+        RLEVEL level; ///< RLEVELMAP is used by any F_LAYERED_TILEMAP RFOCUS.
     } content;
 
 } * RFOCUS;
